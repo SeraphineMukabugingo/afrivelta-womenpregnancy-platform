@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ programme.name }} | WomenPregnancy</title>
+<style>
+:root {
+  --navy:#173548; --teal:#087f8c; --gold:#f2bc54;
+  --bg:#f2f6f8; --text:#263b49; --muted:#647b89; --border:#dbe5ea;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--text); font-family:Arial,sans-serif; }
+header {
+  background:var(--navy); color:white; padding:24px 5%;
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;
+}
+header h1 { margin:0; font-size:25px; }
+header h1 span { color:var(--gold); }
+header p { margin:7px 0 0; font-size:12px; letter-spacing:2px; }
+a { text-decoration:none; }
+.nav-link { color:white; border:1px solid #7d919c; border-radius:8px; padding:10px 14px; }
+main { max-width:1200px; padding:36px 20px; margin:auto; }
+.panel { background:white; border:1px solid var(--border); border-radius:14px; padding:26px; margin-bottom:22px; }
+.eyebrow { color:var(--teal); letter-spacing:2px; font-size:13px; font-weight:bold; }
+h2 { font-size:29px; overflow-wrap:anywhere; }
+h3 { margin-top:0; }
+.muted { color:var(--muted); line-height:1.6; }
+.status { display:inline-block; padding:7px 12px; border-radius:20px; background:#fff2d7; color:#76520d; font-size:13px; font-weight:bold; }
+.details { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-top:24px; }
+.item { padding:15px; border:1px solid var(--border); border-radius:9px; overflow-wrap:anywhere; }
+.item strong { display:block; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px; }
+.full { grid-column:1/-1; }
+.button { display:inline-block; background:var(--teal); color:white; padding:12px 16px; border-radius:8px; font-weight:bold; }
+.button.secondary { background:white; color:var(--teal); border:1px solid var(--border); }
+.actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:24px; }
+.alert { background:#e8f5f5; border-radius:8px; padding:13px 15px; margin-bottom:14px; }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; min-width:760px; }
+th,td { text-align:left; padding:13px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+th { color:var(--muted); font-size:12px; text-transform:uppercase; }
+td a { color:var(--teal); font-weight:bold; }
+.progress-track { width:120px; max-width:100%; height:9px; background:#e6edf0; border-radius:8px; overflow:hidden; margin:6px 0; }
+.progress-fill { height:100%; background:var(--teal); }
+@media(max-width:600px) {
+  .details { grid-template-columns:1fr; }
+  .full { grid-column:auto; }
+  .panel { padding:18px; }
+  h2 { font-size:25px; }
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+.summary-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  background: #fff;
+}
+.summary-label {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.summary-value {
+  color: var(--navy);
+  font-size: 30px;
+  font-weight: bold;
+  margin-top: 8px;
+}
+.summary-progress {
+  height: 9px;
+  background: #e6edf0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+.summary-progress-fill {
+  height: 100%;
+  background: var(--teal);
+}
+
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>AFRIVELTA <span>WomenPregnancy</span></h1>
+    <p>ORGANISATION IMPACT HUB</p>
+  </div>
+  <a class="nav-link" href="/">Back to dashboard</a>
+</header>
+
+<main>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <section class="panel">
+    <div class="eyebrow">PROGRAMME DETAILS</div>
+    <h2>{{ programme.name }}</h2>
+    <span class="status">{{ programme.get_status_display }}</span>
+
+    <div class="details">
+      <div class="item">
+        <strong>Organisation</strong>
+        {{ programme.organization.name }}
+      </div>
+      <div class="item">
+        <strong>Target group</strong>
+        {{ programme.target_group }}
+      </div>
+      <div class="item">
+        <strong>Country</strong>
+        {{ programme.country }}
+      </div>
+      <div class="item">
+        <strong>District or city</strong>
+        {{ programme.district_or_city|default:"Not specified" }}
+      </div>
+      <div class="item">
+        <strong>Start date</strong>
+        {{ programme.start_date|date:"j F Y" }}
+      </div>
+      <div class="item">
+        <strong>End date</strong>
+        {{ programme.end_date|date:"j F Y" }}
+      </div>
+      <div class="item full">
+        <strong>Description</strong>
+        {% if programme.description %}
+          {{ programme.description|linebreaksbr }}
+        {% else %}
+          <span class="muted">No description provided.</span>
+        {% endif %}
+      </div>
+      <div class="item full">
+        <strong>Objectives</strong>
+        {{ programme.objectives|linebreaksbr }}
+      </div>
+      <div class="item">
+        <strong>Programme lead</strong>
+        {{ programme.lead_user|default:"Not assigned" }}
+      </div>
+      <div class="item">
+        <strong>Created by</strong>
+        {{ programme.created_by|default:"Not recorded" }}
+      </div>
+      <div class="item">
+        <strong>Created at</strong>
+        {{ programme.created_at|date:"j F Y, H:i" }}
+      </div>
+      <div class="item">
+        <strong>Last updated</strong>
+        {{ programme.updated_at|date:"j F Y, H:i" }}
+      </div>
+    </div>
+
+    <div class="actions">
+      <a class="button secondary" href="{% url 'programme-list' %}">
+        Back to programme register
+      </a>
+      {% if can_edit %}
+        <a class="button" href="{% url 'programme-update' programme.pk %}">
+          Edit programme
+        </a>
+      {% endif %}
+    </div>
+  </section>
+
+
+  <section class="panel">
+    <div class="eyebrow">IMPLEMENTATION OVERVIEW</div>
+    <h2>Activity Progress Summary</h2>
+    <p class="muted">
+      A live summary calculated from the activities recorded for this programme.
+    </p>
+
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-label">Total activities</div>
+        <div class="summary-value">{{ activity_summary.total }}</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-label">Planned</div>
+        <div class="summary-value">{{ activity_summary.planned }}</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-label">In progress</div>
+        <div class="summary-value">{{ activity_summary.in_progress }}</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-label">Completed</div>
+        <div class="summary-value">{{ activity_summary.completed }}</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-label">Average activity completion</div>
+        <div class="summary-value">{{ activity_summary.average_progress }}%</div>
+        <div class="summary-progress">
+          <div class="summary-progress-fill"
+               style="width:{{ activity_summary.average_progress }}%;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="actions" style="justify-content:space-between; align-items:center; margin-top:0;">
+      <div>
+        <h2 style="margin-top:0;">Activities and Milestones</h2>
+        <p class="muted">Track planned work and implementation progress.</p>
+      </div>
+      {% if can_edit %}
+        <a class="button"
+           href="{% url 'programme-activity-create' programme.pk %}">
+          + Add Activity
+        </a>
+      {% endif %}
+    </div>
+
+    {% with activities=programme.activities.all %}
+      {% if activities %}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Activity</th>
+                <th>Type</th>
+                <th>Schedule</th>
+                <th>Assigned to</th>
+                <th>Status</th>
+                <th>Progress</th>
+                {% if can_edit %}<th>Action</th>{% endif %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for activity in activities %}
+                <tr>
+                  <td>
+                    <strong>{{ activity.title }}</strong>
+                    {% if activity.description %}
+                      <br><span class="muted">{{ activity.description }}</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ activity.get_activity_type_display }}</td>
+                  <td>
+                    {{ activity.start_date|date:"j M Y" }} –
+                    {{ activity.end_date|date:"j M Y" }}
+                  </td>
+                  <td>{{ activity.assigned_to|default:"Unassigned" }}</td>
+                  <td>{{ activity.get_status_display }}</td>
+                  <td>
+                    {{ activity.progress_percent }}%
+                    <div class="progress-track">
+                      <div class="progress-fill"
+                           style="width:{{ activity.progress_percent }}%;"></div>
+                    </div>
+                  </td>
+                  {% if can_edit %}
+                    <td>
+                      <a href="{% url 'programme-activity-update' activity.pk %}">
+                        Edit
+                      </a>
+                    </td>
+                  {% endif %}
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="muted">
+          No activities have been added to this programme yet.
+          {% if can_edit %}
+            Select “Add Activity” to create the first one.
+          {% else %}
+            An authorised programme manager can add activities here.
+          {% endif %}
+        </p>
+      {% endif %}
+    {% endwith %}
+  </section>
+
+  <section class="panel">
+    <div class="actions"
+         style="justify-content:space-between; align-items:center; margin-top:0;">
+      <div>
+        <h2>Programme Milestones</h2>
+        <p class="muted">
+          Monitor deliverables, deadlines, responsible people and evidence.
+        </p>
+      </div>
+      {% if can_edit %}
+        <a class="button"
+           href="{% url 'programme-milestone-create' programme.pk %}">
+          + Add Milestone
+        </a>
+      {% endif %}
+    </div>
+
+    {% with milestones=programme.milestones.all %}
+      {% if milestones %}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Milestone</th>
+                <th>Due date</th>
+                <th>Responsible</th>
+                <th>Status</th>
+                <th>Completion date</th>
+                <th>Evidence</th>
+                {% if can_edit %}<th>Action</th>{% endif %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for milestone in milestones %}
+                <tr>
+                  <td>
+                    <strong>{{ milestone.title }}</strong>
+                    {% if milestone.description %}
+                      <br><span class="muted">{{ milestone.description }}</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ milestone.due_date|date:"j M Y" }}</td>
+                  <td>{{ milestone.responsible_user|default:"Unassigned" }}</td>
+                  <td>{{ milestone.get_status_display }}</td>
+                  <td>
+                    {% if milestone.completion_date %}
+                      {{ milestone.completion_date|date:"j M Y" }}
+                    {% else %}
+                      Not recorded
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if milestone.evidence_summary %}
+                      {{ milestone.evidence_summary }}
+                    {% else %}
+                      <span class="muted">Not recorded</span>
+                    {% endif %}
+                    {% if milestone.evidence_reference %}
+                      <br><span class="muted">
+                        Reference: {{ milestone.evidence_reference }}
+                      </span>
+                    {% endif %}
+                  </td>
+                  {% if can_edit %}
+                    <td>
+                      <a href="{% url 'programme-milestone-update' milestone.pk %}">
+                        Edit
+                      </a>
+                    </td>
+                  {% endif %}
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="muted">
+          No milestones have been recorded for this programme yet.
+          {% if can_edit %}
+            Select “Add Milestone” to record the first deliverable.
+          {% else %}
+            An authorised programme manager can add milestones here.
+          {% endif %}
+        </p>
+      {% endif %}
+    {% endwith %}
+  </section>
+
+</main>
+</body>
+</html>

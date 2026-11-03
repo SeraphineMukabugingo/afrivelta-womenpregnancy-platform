@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Referral Follow-ups | AFRIVELTA{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+    <div>
+        <p class="eyebrow">REFERRAL MANAGEMENT</p>
+        <h1>Referral Follow-up Management</h1>
+        <p>
+            Monitor outstanding referrals and identify service
+            coordination activities requiring attention.
+        </p>
+    </div>
+
+    <a class="btn btn-outline" href="{% url 'referral-list' %}">
+        Back to Referrals
+    </a>
+</section>
+
+<div class="message">
+    Follow-up lists contain operational referral information.
+    They do not establish whether a person received effective
+    treatment or experienced a particular health outcome.
+</div>
+
+<div class="message">
+    A referral may appear in more than one category. For example,
+    an overdue referral may also be unassigned.
+</div>
+
+{% for section in sections %}
+<div class="card">
+    <div class="section-heading">
+        <div>
+            <h2>{{ section.title }}</h2>
+            <p>{{ section.description }}</p>
+        </div>
+        <span>{{ section.records|length }} record(s)</span>
+    </div>
+
+    {% if section.records %}
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Reference</th>
+                        <th>Organization</th>
+                        <th>Service Provider</th>
+                        <th>Follow-up Date</th>
+                        <th>Assigned Staff</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for record in section.records %}
+                    <tr>
+                        <td>
+                            <strong>{{ record.reference_code }}</strong>
+                        </td>
+
+                        <td>{{ record.organization.name }}</td>
+
+                        <td>{{ record.provider.name }}</td>
+
+                        <td>
+                            {% if record.follow_up_due %}
+                                {{ record.follow_up_due|date:"d M Y" }}
+                            {% else %}
+                                Not scheduled
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if record.assigned_staff %}
+                                {{ record.assigned_staff.get_full_name|default:record.assigned_staff.username }}
+                            {% else %}
+                                Unassigned
+                            {% endif %}
+                        </td>
+
+                        <td>{{ record.get_status_display }}</td>
+
+                        <td>
+                            <a href="{% url 'referral-detail' record.pk %}">
+                                View details
+                            </a>
+                            |
+                            <a href="{% url 'referral-update' record.pk %}">
+                                Update
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No referrals currently appear in this category.</p>
+        </div>
+    {% endif %}
+</div>
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#12304a">
+
+    <title>{% block title %}AFRIVELTA WomenPregnancy{% endblock %}</title>
+
+    <link rel="stylesheet"
+          href="{% static 'organizations/css/site.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="nav-container">
+            <a class="brand"
+   href="{% url 'dashboard' %}"
+   aria-label="AFRIVELTA Technology home">
+    <img
+        class="brand-logo"
+        src="{% static 'organizations/images/afrivelta-logo.png' %}"
+        alt="AFRIVELTA Technology — Turning Data into Intelligent Solutions">
+    <span class="platform-label">
+        WOMENPREGNANCY<br>PLATFORM
+    </span>
+</a>
+
+            <nav class="main-nav" aria-label="Main navigation">
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="/programmes/">Programmes</a>
+                {% if user.is_superuser or perms.organizations.manage_platform_users %}
+                    <a href="{% url 'staff-list' %}">Staff Management</a>
+                    <a href="{% url 'organization-admin-list' %}">Organization Administration</a>
+                {% endif %}
+
+                <a href="/education/">Youth Education</a>
+                <a href="{% url 'provider-list' %}">Service Providers</a>
+                {% if user.is_staff %}
+                    <a href="{% url 'referral-list' %}">Referral Records</a>
+                {% endif %}
+                {% if user.is_superuser or perms.organizations.manage_platform_users or perms.organizations.manage_organization_members or perms.programmes.view_programme_analytics or perms.content_library.create_content or perms.content_library.submit_content or perms.content_library.review_content or perms.content_library.publish_content or perms.referrals.view_referral_metrics or perms.referrals.manage_referrals or perms.referrals.manage_serviceproviders or perms.referrals.verify_serviceprovider or perms.referrals.view_verified_provider_directory %}
+                    <a href="{% url 'reporting-dashboard' %}">Impact Reports</a>
+                {% endif %}
+            </nav>
+
+            <div class="account-nav">
+                <a class="btn btn-primary btn-small"
+                   href="{% url 'admin:login' %}">Login</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-container">
+        {% if messages %}
+            <div class="messages" aria-live="polite">
+                {% for message in messages %}
+                    <div class="message message-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <span><strong>AFRIVELTA Technology</strong></span>
+            <span>Education, programme coordination and trusted referrals</span>
+        </div>
+        <div class="footer-bottom">
+            &copy; {% now "Y" %} AFRIVELTA Technology. All rights reserved.
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

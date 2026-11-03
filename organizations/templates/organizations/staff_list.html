@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Staff Management | AFRIVELTA{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">AFRIVELTA ADMINISTRATION</p>
+        <h1>Staff Management</h1>
+        <p>Manage staff accounts and organizational access.</p>
+    </div>
+    <a href="{% url 'staff-create' %}" class="btn btn-primary">
+        + Add Staff Member
+    </a>
+</section>
+
+<div class="card">
+    <form method="get">
+        <label for="staff-search">Search staff</label>
+        <input id="staff-search" type="search" name="q"
+               value="{{ search_query }}"
+               placeholder="Username, name or email">
+        <button class="btn btn-primary" type="submit">Search</button>
+        <a class="btn btn-outline" href="{% url 'staff-list' %}">Clear</a>
+    </form>
+</div>
+
+<div class="card">
+    <h2>Staff Directory</h2>
+
+    {% if staff_members %}
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Department Roles</th>
+                    <th>Organizations</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in staff_members %}
+                <tr>
+                    <td>{{ member.username }}</td>
+                    <td>{{ member.get_full_name|default:"Not provided" }}</td>
+                    <td>{{ member.email|default:"Not provided" }}</td>
+                    <td>
+                        {% for group in member.groups.all %}
+                            {{ group.name }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            No department role
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for membership in member.organization_memberships.all %}
+                            {{ membership.organization.name }}
+                            — {{ membership.get_role_display }}
+                            ({{ membership.get_status_display }})
+                            {% if not forloop.last %}<br>{% endif %}
+                        {% empty %}
+                            No organization
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% if member.is_superuser %}
+                            System Superuser
+                        {% elif member.is_active %}
+                            Active
+                        {% else %}
+                            Inactive
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not member.is_superuser and member.pk != user.pk %}
+                            <a href="{% url 'staff-update' member.pk %}">
+                                Edit
+                            </a>
+                        {% else %}
+                            Protected
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p>No staff accounts found.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,574 @@
+{% extends "base.html" %}
+
+{% block title %}Impact & Analytics | AFRIVELTA{% endblock %}
+
+{% block extra_css %}
+<style>
+.analytics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.analytics-header h1 {
+    margin-bottom: 8px;
+}
+
+.analytics-actions,
+.analytics-filters,
+.analytics-kpis {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.analytics-filters {
+    align-items: end;
+    padding: 20px;
+    margin-bottom: 28px;
+    border: 1px solid var(--border-color, #dce3ea);
+    border-radius: 12px;
+}
+
+.analytics-filters label {
+    display: grid;
+    gap: 6px;
+    font-weight: 600;
+}
+
+.analytics-filters input {
+    padding: 10px;
+    border: 1px solid #cbd5df;
+    border-radius: 7px;
+}
+
+.analytics-section {
+    margin: 30px 0;
+}
+
+.analytics-section h2 {
+    margin-bottom: 16px;
+}
+
+.analytics-kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+}
+
+.analytics-kpi {
+    padding: 19px;
+    background: #ffffff;
+    border: 1px solid #dce3ea;
+    border-radius: 12px;
+}
+
+.analytics-kpi .metric-label {
+    display: block;
+    color: #637487;
+    font-size: 0.88rem;
+    margin-bottom: 10px;
+}
+
+.analytics-kpi strong {
+    display: block;
+    color: #173b59;
+    font-size: 1.8rem;
+}
+
+.analytics-kpi small {
+    color: #637487;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+}
+
+.analytics-card {
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #dce3ea;
+    border-radius: 12px;
+}
+
+.analytics-card h3 {
+    margin-top: 0;
+    margin-bottom: 14px;
+}
+
+.analytics-table-wrap {
+    overflow-x: auto;
+}
+
+.analytics-table th,
+.analytics-table td {
+    white-space: nowrap;
+}
+
+.analytics-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.analytics-table th,
+.analytics-table td {
+    padding: 10px;
+    border-bottom: 1px solid #e8edf2;
+    text-align: left;
+}
+
+.analytics-table th:last-child,
+.analytics-table td:last-child {
+    text-align: right;
+}
+
+.analytics-note {
+    color: #637487;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.analytics-empty {
+    padding: 18px;
+    background: #f5f8fb;
+    border-radius: 9px;
+    color: #526579;
+}
+
+@media (max-width: 600px) {
+    .analytics-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .analytics-kpi {
+        padding: 13px;
+    }
+
+    .analytics-kpi strong {
+        font-size: 1.5rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="analytics-header">
+    <div>
+        <p class="eyebrow">AFRIVELTA TECHNOLOGY</p>
+        <h1>Impact & Analytics</h1>
+        <p>
+            Monitor organizations, programmes, educational content,
+            healthcare providers and referral performance.
+        </p>
+        <p class="analytics-note">
+            Report generated: {{ report.generated_at|date:"d M Y, H:i" }}
+        </p>
+    </div>
+
+    <div class="analytics-actions">
+        <a class="btn btn-primary"
+           href="{% url 'reporting-quarterly' %}">
+            Quarterly Impact Report
+        </a>
+
+        <a class="btn btn-outline"
+           href="{% url 'reporting-export' %}?period={{ report.selected_period }}{% if report.period_start %}&start_date={{ report.period_start|date:'Y-m-d' }}{% endif %}{% if report.period_end %}&end_date={{ report.period_end|date:'Y-m-d' }}{% endif %}">
+            Export CSV
+        </a>
+    </div>
+</section>
+
+<form method="get"
+      action="{% url 'reporting-dashboard' %}"
+      class="analytics-filters">
+
+    <label>
+        Reporting period
+        <select name="period">
+            <option value="all" {% if report.selected_period == "all" %}selected{% endif %}>All records</option>
+            <option value="this_month" {% if report.selected_period == "this_month" %}selected{% endif %}>This month</option>
+            <option value="last_month" {% if report.selected_period == "last_month" %}selected{% endif %}>Last month</option>
+            <option value="this_quarter" {% if report.selected_period == "this_quarter" %}selected{% endif %}>This quarter</option>
+            <option value="last_quarter" {% if report.selected_period == "last_quarter" %}selected{% endif %}>Last quarter</option>
+            <option value="year_to_date" {% if report.selected_period == "year_to_date" %}selected{% endif %}>Year to date</option>
+            <option value="last_12_months" {% if report.selected_period == "last_12_months" %}selected{% endif %}>Last 12 months</option>
+            <option value="custom" {% if report.selected_period == "custom" %}selected{% endif %}>Custom dates</option>
+        </select>
+    </label>
+
+    <label>
+        Custom start date
+        <input type="date"
+               name="start_date"
+               value="{{ report.period_start|date:'Y-m-d' }}">
+    </label>
+
+    <label>
+        Custom end date
+        <input type="date"
+               name="end_date"
+               value="{{ report.period_end|date:'Y-m-d' }}">
+    </label>
+
+    <button class="btn btn-primary" type="submit">
+        Generate Report
+    </button>
+
+    <a class="btn btn-outline"
+       href="{% url 'reporting-dashboard' %}">
+        Clear Filters
+    </a>
+</form>
+
+<p class="analytics-note">
+    Date filters apply to record creation dates in the relevant sections.
+    Organization status totals show the current organization portfolio.
+    Overdue milestones and follow-ups are assessed against the current date.
+</p>
+
+{% if report.trends.metrics %}
+<section class="analytics-section">
+    <h2>Monthly Performance Trends</h2>
+    <p class="analytics-note">
+        Monthly recorded activity across the authorized reporting scope.
+        The all-records view displays the latest 12 calendar months.
+    </p>
+
+    <div class="analytics-card analytics-table-wrap">
+        <table class="analytics-table">
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    {% for metric in report.trends.metrics %}
+                    <th>{{ metric.label }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in report.trends.monthly %}
+                <tr>
+                    <td>{{ row.period_label }}</td>
+                    {% for value in row.values %}
+                    <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h2 style="margin-top:28px;">Quarterly Performance Trends</h2>
+    <p class="analytics-note">
+        Quarterly aggregation of the same recorded activity indicators.
+    </p>
+
+    <div class="analytics-card analytics-table-wrap">
+        <table class="analytics-table">
+            <thead>
+                <tr>
+                    <th>Quarter</th>
+                    {% for metric in report.trends.metrics %}
+                    <th>{{ metric.label }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in report.trends.quarterly %}
+                <tr>
+                    <td>{{ row.period_label }}</td>
+                    {% for value in row.values %}
+                    <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <p class="analytics-note">
+        {{ report.trends.activity_completion_note }}
+        {{ report.trends.referral_completion_note }}
+        Provider verification trends use the latest recorded verification date,
+        not a historical verification event log.
+    </p>
+</section>
+{% endif %}
+
+{% if report.organization_metrics %}
+<section class="analytics-section">
+    <h2>Organization Portfolio</h2>
+
+    <div class="analytics-kpis">
+        <div class="analytics-kpi">
+            <span class="metric-label">Total Organizations</span>
+            <strong>{{ report.organization_metrics.total }}</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Active</span>
+            <strong>{{ report.organization_metrics.active }}</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Pending Review</span>
+            <strong>{{ report.organization_metrics.pending }}</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Suspended</span>
+            <strong>{{ report.organization_metrics.suspended }}</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Rejected</span>
+            <strong>{{ report.organization_metrics.rejected }}</strong>
+        </div>
+    </div>
+
+    <div class="analytics-card">
+        <h3>Organization Status Breakdown</h3>
+        <table class="analytics-table">
+            <thead>
+                <tr><th>Status</th><th>Organizations</th></tr>
+            </thead>
+            <tbody>
+                {% for item in report.organization_metrics.statuses %}
+                <tr>
+                    <td>{{ item.label }}</td>
+                    <td>{{ item.count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endif %}
+
+{% if report.programme %}
+<section class="analytics-section">
+    <h2>Programme Performance</h2>
+
+    <div class="analytics-kpis">
+        <div class="analytics-kpi">
+            <span class="metric-label">Total Programmes</span>
+            <strong>{{ report.programme.total }}</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Active Programmes</span>
+            <strong>{{ report.programme.active }}</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Completed Programmes</span>
+            <strong>{{ report.programme.completed }}</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Activities</span>
+            <strong>{{ report.programme.activity_total }}</strong>
+            <small>{{ report.programme.activity_completed }} completed</small>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Average Activity Progress</span>
+            <strong>{{ report.programme.activity_average_progress }}%</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Milestones Achieved</span>
+            <strong>{{ report.programme.milestone_achieved }}</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Milestones At Risk</span>
+            <strong>{{ report.programme.milestone_at_risk }}</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Overdue Milestones</span>
+            <strong>{{ report.programme.milestone_overdue }}</strong>
+        </div>
+    </div>
+
+    <div class="analytics-grid" style="margin-top:18px;">
+        <div class="analytics-card">
+            <h3>Programme Status</h3>
+            <table class="analytics-table">
+                {% for item in report.programme.statuses %}
+                <tr><td>{{ item.label }}</td><td>{{ item.count }}</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div class="analytics-card">
+            <h3>Activity Status</h3>
+            <table class="analytics-table">
+                {% for item in report.programme.activity_statuses %}
+                <tr><td>{{ item.label }}</td><td>{{ item.count }}</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div class="analytics-card">
+            <h3>Milestone Status</h3>
+            <table class="analytics-table">
+                {% for item in report.programme.milestone_statuses %}
+                <tr><td>{{ item.label }}</td><td>{{ item.count }}</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% if report.education %}
+<section class="analytics-section">
+    <h2>Education & Content</h2>
+
+    <div class="analytics-kpis">
+        <div class="analytics-kpi">
+            <span class="metric-label">Total Content</span>
+            <strong>{{ report.education.total }}</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Published</span>
+            <strong>{{ report.education.published }}</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Approved</span>
+            <strong>{{ report.education.approved }}</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Under Review</span>
+            <strong>{{ report.education.in_review }}</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Shared Content</span>
+            <strong>{{ report.education.shared }}</strong>
+        </div>
+
+        {% if report.permissions.organizations %}
+        <div class="analytics-kpi">
+            <span class="metric-label">Unassigned Content</span>
+            <strong>{{ report.education.unassigned }}</strong>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="analytics-card">
+        <h3>Content Review Status</h3>
+        <table class="analytics-table">
+            {% for item in report.education.statuses %}
+            <tr><td>{{ item.label }}</td><td>{{ item.count }}</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</section>
+{% endif %}
+
+{% if report.providers %}
+<section class="analytics-section">
+    <h2>Healthcare Service Providers</h2>
+
+    <div class="analytics-kpis">
+        <div class="analytics-kpi">
+            <span class="metric-label">Total Providers</span>
+            <strong>{{ report.providers.total }}</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Active Providers</span>
+            <strong>{{ report.providers.active }}</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Verified Providers</span>
+            <strong>{{ report.providers.verified }}</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Pending Verification</span>
+            <strong>{{ report.providers.pending }}</strong>
+        </div>
+    </div>
+
+    <div class="analytics-card">
+        <h3>Provider Verification Status</h3>
+        <table class="analytics-table">
+            {% for item in report.providers.statuses %}
+            <tr><td>{{ item.label }}</td><td>{{ item.count }}</td></tr>
+            {% endfor %}
+        </table>
+
+        <h3 style="margin-top:24px;">Provider Distribution by District</h3>
+        <table class="analytics-table">
+            {% for item in report.providers.districts %}
+            <tr><td>{{ item.district }}</td><td>{{ item.total }}</td></tr>
+            {% empty %}
+            <tr><td colspan="2">No provider records available.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</section>
+{% endif %}
+
+{% if report.referrals %}
+<section class="analytics-section">
+    <h2>Referral Performance</h2>
+
+    <div class="analytics-kpis">
+        <div class="analytics-kpi">
+            <span class="metric-label">Total Referrals</span>
+            <strong>{{ report.referrals.total }}</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Open Referrals</span>
+            <strong>{{ report.referrals.open }}</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Completed Referrals</span>
+            <strong>{{ report.referrals.completed }}</strong>
+        </div>
+
+        <div class="analytics-kpi">
+            <span class="metric-label">Overdue Follow-ups</span>
+            <strong>{{ report.referrals.follow_up_overdue }}</strong>
+        </div>
+    </div>
+
+    <div class="analytics-card">
+        <h3>Referral Status Breakdown</h3>
+        <table class="analytics-table">
+            {% for item in report.referrals.statuses %}
+            <tr><td>{{ item.label }}</td><td>{{ item.count }}</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</section>
+{% endif %}
+
+{% if not report.organization_metrics and not report.programme and not report.education and not report.providers and not report.referrals %}
+<div class="analytics-empty">
+    No reporting sections are available for your current permissions.
+    Contact your platform administrator for access.
+</div>
+{% endif %}
+
+<p class="analytics-note">
+    These indicators describe recorded programme and service activity.
+    They do not independently establish changes in pregnancy or other health outcomes.
+</p>
+
+{% endblock %}

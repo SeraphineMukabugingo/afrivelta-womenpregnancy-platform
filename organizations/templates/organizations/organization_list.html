@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Organizations | AFRIVELTA{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">PARTNER ADMINISTRATION</p>
+        <h1>Organizations</h1>
+        <p>Review and manage organizations participating in WomenPregnancy.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'organization-admin-create' %}">
+        + Register Organization
+    </a>
+</section>
+
+<div class="card">
+    <form method="get">
+        <label for="org-search">Search organizations</label>
+        <input id="org-search" type="search" name="q"
+               value="{{ search_query }}" placeholder="Organization name">
+        <label for="org-status">Status</label>
+        <select id="org-status" name="status">
+            <option value="">All statuses</option>
+            {% for value, label in status_choices %}
+                <option value="{{ value }}"
+                    {% if selected_status == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+            {% endfor %}
+        </select>
+        <button class="btn btn-primary" type="submit">Filter</button>
+        <a class="btn btn-outline" href="{% url 'organization-admin-list' %}">
+            Clear
+        </a>
+    </form>
+</div>
+
+<div class="card">
+    <h2>Organization Register</h2>
+    {% if organizations %}
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Organization</th>
+                    <th>Type</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Members</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for org in organizations %}
+                <tr>
+                    <td><strong>{{ org.name }}</strong></td>
+                    <td>{{ org.get_organization_type_display }}</td>
+                    <td>{{ org.district_or_city }}, {{ org.country }}</td>
+                    <td>{{ org.get_status_display }}</td>
+                    <td>{{ org.memberships.count }}</td>
+                    <td>
+                        <a href="{% url 'organization-admin-detail' org.pk %}">
+                            View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p>No organizations found.</p>
+    {% endif %}
+</div>
+{% endblock %}

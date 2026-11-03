@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page_title }} | WomenPregnancy</title>
+<style>
+:root {
+  --navy:#173548;
+  --teal:#087f8c;
+  --gold:#f2bc54;
+  --bg:#f2f6f8;
+  --text:#263b49;
+  --muted:#647b89;
+  --border:#dbe5ea;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,sans-serif;
+}
+header {
+  background:var(--navy);
+  color:white;
+  padding:24px 5%;
+}
+header h1 { margin:0; font-size:25px; }
+header h1 span { color:var(--gold); }
+header p { margin:7px 0 0; font-size:12px; letter-spacing:2px; }
+main { max-width:950px; padding:32px 20px; margin:auto; }
+.panel {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:28px;
+}
+.muted { color:var(--muted); line-height:1.6; }
+.form-row { margin:20px 0; }
+label { display:block; margin-bottom:8px; font-weight:bold; }
+.form-control {
+  display:block;
+  width:100%;
+  border:1px solid #cbd8df;
+  border-radius:7px;
+  padding:12px;
+  color:var(--text);
+  background:white;
+  font:inherit;
+}
+textarea.form-control { resize:vertical; }
+.errors { color:#b42318; font-size:14px; margin-top:6px; }
+.error-summary {
+  color:#a62c20;
+  background:#fff0ed;
+  border-radius:8px;
+  padding:14px;
+}
+.button {
+  display:inline-block;
+  padding:12px 17px;
+  border:0;
+  border-radius:8px;
+  background:var(--teal);
+  color:white;
+  font-weight:bold;
+  font-size:14px;
+  cursor:pointer;
+}
+.secondary {
+  display:inline-block;
+  padding:12px 17px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  color:var(--teal);
+}
+.actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:26px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>AFRIVELTA <span>WomenPregnancy</span></h1>
+  <p>ORGANISATION IMPACT HUB</p>
+</header>
+
+<main>
+  <section class="panel">
+    <p class="muted">Programme: <strong>{{ programme.name }}</strong></p>
+    <h2>{{ page_title }}</h2>
+    <p class="muted">
+      Record a milestone, its deadline, responsible person and evidence
+      of progress. Do not include young people's identifying or private
+      health information in evidence fields.
+    </p>
+
+    {% if form.non_field_errors %}
+      <div class="error-summary">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="form-row">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <div class="muted">{{ field.help_text }}</div>
+          {% endif %}
+          {% if field.errors %}
+            <div class="errors">{{ field.errors }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <div class="actions">
+        <a class="secondary"
+           href="{% url 'programme-detail' programme.pk %}">Cancel</a>
+        <button class="button" type="submit">{{ button_label }}</button>
+      </div>
+    </form>
+  </section>
+</main>
+</body>
+</html>

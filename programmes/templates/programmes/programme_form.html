@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>New Programme | WomenPregnancy</title>
+    <style>
+        :root {
+            --navy: #173548;
+            --teal: #087f8c;
+            --gold: #f2bc54;
+            --background: #f2f6f8;
+            --text: #263b49;
+            --muted: #647b89;
+            --border: #dbe5ea;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: var(--background);
+            color: var(--text);
+            font-family: Arial, sans-serif;
+        }
+        header {
+            background: var(--navy);
+            color: white;
+            padding: 24px 5%;
+        }
+        header h1 { margin: 0; font-size: 25px; }
+        header h1 span { color: var(--gold); }
+        header p {
+            margin: 7px 0 0;
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+        main { max-width: 1000px; padding: 36px 20px; margin: auto; }
+        .panel {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 30px;
+        }
+        .muted { color: var(--muted); line-height: 1.6; }
+        .form-row { margin: 20px 0; }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .form-control {
+            display: block;
+            width: 100%;
+            border: 1px solid #cbd8df;
+            border-radius: 7px;
+            padding: 12px;
+            color: var(--text);
+            background: white;
+            font: inherit;
+        }
+        textarea.form-control { resize: vertical; }
+        .help, .errors { font-size: 14px; margin-top: 6px; }
+        .errors { color: #b42318; }
+        .alert {
+            padding: 14px;
+            border-radius: 8px;
+            background: #fff0ed;
+            color: #a62c20;
+            margin-bottom: 18px;
+        }
+        .button {
+            display: inline-block;
+            padding: 13px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: var(--teal);
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .secondary {
+            display: inline-block;
+            padding: 13px 18px;
+            border-radius: 8px;
+            color: var(--navy);
+            border: 1px solid var(--border);
+            margin-right: 8px;
+        }
+        .actions { margin-top: 26px; }
+        @media (max-width: 600px) {
+            .panel { padding: 18px; }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>AFRIVELTA <span>WomenPregnancy</span></h1>
+    <p>ORGANISATION IMPACT HUB</p>
+</header>
+
+<main>
+    <section class="panel">
+        <h2>Create a Programme</h2>
+        <p class="muted">
+            Record the programme's objectives, target group, location,
+            schedule and implementation status.
+        </p>
+
+        {% if not organizations_available %}
+            <div class="alert">
+                No eligible organisation is available for programme creation.
+                An administrator may need to activate your organisation and
+                membership, or assign you an organisation administrator or
+                programme manager role.
+            </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="form-row">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <div class="help muted">{{ field.help_text }}</div>
+                    {% endif %}
+
+                    {% if field.errors %}
+                        <div class="errors">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="actions">
+                <a class="secondary" href="{% url 'programme-list' %}">
+                    Cancel
+                </a>
+                <button class="button" type="submit"
+                        {% if not organizations_available %}disabled{% endif %}>
+                    Save Programme
+                </button>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

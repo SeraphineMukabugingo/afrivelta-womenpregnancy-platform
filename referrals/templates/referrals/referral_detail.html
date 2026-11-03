@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Referral Details | AFRIVELTA{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+    <div>
+        <p class="eyebrow">REFERRAL MANAGEMENT</p>
+        <h1>Referral Details</h1>
+        <p>Reference: <strong>{{ record.reference_code }}</strong></p>
+    </div>
+
+    <div>
+        <a class="btn btn-primary"
+           href="{% url 'referral-update' record.pk %}">
+            Update Referral
+        </a>
+
+        <a class="btn btn-outline"
+           href="{% url 'referral-list' %}">
+            Back to Referrals
+        </a>
+    </div>
+</section>
+
+<div class="card">
+    <h2>Referral Overview</h2>
+
+    <div class="table-responsive">
+        <table>
+            <tbody>
+                <tr>
+                    <th>Reference Number</th>
+                    <td>{{ record.reference_code }}</td>
+                </tr>
+                <tr>
+                    <th>Organization</th>
+                    <td>{{ record.organization.name }}</td>
+                </tr>
+                <tr>
+                    <th>Service Provider</th>
+                    <td>{{ record.provider.name }}</td>
+                </tr>
+                <tr>
+                    <th>Service Category</th>
+                    <td>{{ record.provider.get_category_display }}</td>
+                </tr>
+                <tr>
+                    <th>District</th>
+                    <td>{{ record.provider.district }}</td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <td>{{ record.get_status_display }}</td>
+                </tr>
+                <tr>
+                    <th>Referring Staff</th>
+                    <td>{{ record.referring_staff.username }}</td>
+                </tr>
+                <tr>
+                    <th>Assigned Staff</th>
+                    <td>
+                        {{ record.assigned_staff.username|default:"Not assigned" }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Consent Confirmed</th>
+                    <td>
+                        {% if record.consent_confirmed %}Yes{% else %}No{% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Referral Date</th>
+                    <td>{{ record.referral_date|date:"d M Y" }}</td>
+                </tr>
+                <tr>
+                    <th>Follow-up Due</th>
+                    <td>
+                        {{ record.follow_up_due|date:"d M Y"|default:"Not scheduled" }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Created</th>
+                    <td>{{ record.created_at|date:"d M Y, H:i" }}</td>
+                </tr>
+                <tr>
+                    <th>Last Updated</th>
+                    <td>{{ record.updated_at|date:"d M Y, H:i" }}</td>
+                </tr>
+                <tr>
+                    <th>Closed</th>
+                    <td>
+                        {{ record.closed_at|date:"d M Y, H:i"|default:"Not closed" }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if record.non_identifying_notes %}
+<div class="card">
+    <h2>Operational Notes</h2>
+    <p>{{ record.non_identifying_notes|linebreaksbr }}</p>
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="section-heading">
+        <h2>Referral Status History</h2>
+        <span>{{ status_history|length }} event(s)</span>
+    </div>
+
+    {% for item in status_history %}
+        <article style="border-left:3px solid var(--border);
+                        padding:8px 0 16px 18px;
+                        margin-bottom:12px;">
+
+            <strong>
+                {% if item.from_status %}
+                    {{ item.get_from_status_display }}
+                {% else %}
+                    Referral Created
+                {% endif %}
+                &rarr;
+                {{ item.get_to_status_display }}
+            </strong>
+
+            <p>
+                <small class="helptext">
+                    {{ item.changed_at|date:"d M Y, H:i" }}
+                    &middot;
+                    {% if item.changed_by %}
+                        {{ item.changed_by.username }}
+                    {% else %}
+                        User unavailable
+                    {% endif %}
+                </small>
+            </p>
+
+            {% if item.note %}
+                <p>{{ item.note }}</p>
+            {% endif %}
+        </article>
+    {% empty %}
+        <div class="empty-state">
+            <h3>No status history recorded</h3>
+            <p>
+                Status changes recorded after the audit-history feature
+                was introduced will appear here.
+            </p>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

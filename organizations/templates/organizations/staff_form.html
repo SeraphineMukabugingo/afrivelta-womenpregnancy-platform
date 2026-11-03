@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title|default:"Add Staff Member" }} | AFRIVELTA{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">AFRIVELTA ADMINISTRATION</p>
+        <h1>{{ page_title|default:"Add Staff Member" }}</h1>
+        <p>Manage account details, department roles and organization access.</p>
+    </div>
+</section>
+
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="message message-error">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            <div class="form-field">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+
+                {% if field.help_text %}
+                    <small>{{ field.help_text }}</small>
+                {% endif %}
+
+                {% for error in field.errors %}
+                    <p class="error-text">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">
+                {{ button_label|default:"Create Staff Account" }}
+            </button>
+            <a href="{% url 'staff-list' %}" class="btn btn-outline">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

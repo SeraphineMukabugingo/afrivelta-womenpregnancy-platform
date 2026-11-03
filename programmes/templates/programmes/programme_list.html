@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Programme Planning | WomenPregnancy</title>
+<style>
+:root {
+  --navy:#173548;
+  --teal:#087f8c;
+  --gold:#f2bc54;
+  --bg:#f2f6f8;
+  --text:#263b49;
+  --muted:#647b89;
+  --border:#dbe5ea;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,sans-serif;
+}
+header {
+  background:var(--navy);
+  color:white;
+  padding:24px 5%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:16px;
+}
+header h1 { margin:0; font-size:25px; }
+header h1 span { color:var(--gold); }
+header p { margin:7px 0 0; font-size:12px; letter-spacing:2px; }
+a { text-decoration:none; }
+.nav-link {
+  color:white;
+  border:1px solid #7d919c;
+  border-radius:8px;
+  padding:10px 14px;
+}
+main { max-width:1500px; margin:auto; padding:36px 5%; }
+.eyebrow {
+  color:var(--teal);
+  font-size:13px;
+  font-weight:bold;
+  letter-spacing:2px;
+}
+.heading {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:18px;
+  flex-wrap:wrap;
+  margin-bottom:24px;
+}
+h2 { margin:8px 0; font-size:30px; }
+.muted { color:var(--muted); line-height:1.6; }
+.panel {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:24px;
+  margin-bottom:22px;
+}
+.button {
+  display:inline-block;
+  background:var(--teal);
+  color:white;
+  padding:12px 16px;
+  border:0;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:14px;
+}
+.button:hover { background:var(--navy); }
+.button.secondary {
+  background:white;
+  color:var(--teal);
+  border:1px solid var(--border);
+}
+.metric {
+  font-size:34px;
+  font-weight:bold;
+  color:var(--navy);
+  margin-top:10px;
+}
+.filters {
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  align-items:end;
+  margin:24px 0;
+}
+.filters label {
+  display:block;
+  font-weight:bold;
+  margin-bottom:7px;
+}
+.filters input, .filters select {
+  width:260px;
+  max-width:100%;
+  padding:12px;
+  border:1px solid #cbd8df;
+  border-radius:7px;
+  background:white;
+  font:inherit;
+}
+.table-wrap { overflow-x:auto; }
+table {
+  width:100%;
+  border-collapse:collapse;
+  min-width:850px;
+}
+th, td {
+  text-align:left;
+  padding:16px 12px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+}
+th {
+  color:var(--muted);
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+td a { color:var(--teal); font-weight:bold; }
+.status {
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:20px;
+  background:#fff2d7;
+  color:#76520d;
+  font-size:12px;
+  font-weight:bold;
+}
+.actions { display:flex; flex-wrap:wrap; gap:12px; }
+.alert {
+  padding:14px;
+  border-radius:8px;
+  background:#e8f5f5;
+  margin-bottom:16px;
+}
+@media(max-width:600px) {
+  main { padding:24px 16px; }
+  .panel { padding:16px; }
+  h2 { font-size:25px; }
+  .filters, .filters > div { width:100%; }
+  .filters input, .filters select { width:100%; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>AFRIVELTA <span>WomenPregnancy</span></h1>
+    <p>ORGANISATION IMPACT HUB</p>
+  </div>
+  <a class="nav-link" href="/">Back to dashboard</a>
+</header>
+
+<main>
+  <div class="eyebrow">PROGRAMME MANAGEMENT</div>
+
+  <div class="heading">
+    <div>
+      <h2>Prevention Programme Planning</h2>
+      <p class="muted">
+        Search programmes, review details and track implementation.
+      </p>
+    </div>
+    <a class="button" href="{% url 'programme-create' %}">
+      + New Programme
+    </a>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <section class="panel">
+    <div class="muted">Programmes matching your access and filters</div>
+    <div class="metric">{{ programme_count }}</div>
+
+    <form method="get" class="filters">
+      <div>
+        <label for="q">Search programmes</label>
+        <input id="q" type="search" name="q"
+               value="{{ search_query }}"
+               placeholder="Programme, organisation or target group">
+      </div>
+
+      <div>
+        <label for="status">Filter by status</label>
+        <select id="status" name="status">
+          <option value="">All statuses</option>
+          {% for value, label in status_choices %}
+            <option value="{{ value }}"
+              {% if selected_status == value %}selected{% endif %}>
+              {{ label }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <button class="button" type="submit">Apply filters</button>
+      <a class="button secondary" href="{% url 'programme-list' %}">
+        Clear filters
+      </a>
+    </form>
+
+    <h3>Programme Register</h3>
+
+    {% if programmes %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Programme</th>
+              <th>Organisation</th>
+              <th>Location</th>
+              <th>Start date</th>
+              <th>End date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for programme in programmes %}
+              <tr>
+                <td>
+                  <strong>{{ programme.name }}</strong><br>
+                  <span class="muted">{{ programme.target_group }}</span>
+                </td>
+                <td>{{ programme.organization.name }}</td>
+                <td>
+                  {{ programme.district_or_city|default:"Not specified" }},
+                  {{ programme.country }}
+                </td>
+                <td>{{ programme.start_date|date:"j M Y" }}</td>
+                <td>{{ programme.end_date|date:"j M Y" }}</td>
+                <td>
+                  <span class="status">
+                    {{ programme.get_status_display }}
+                  </span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <a href="{% url 'programme-detail' programme.pk %}">
+                      View details
+                    </a>
+                    {% if programme.organization_id in editable_organization_ids %}
+                      <a href="{% url 'programme-update' programme.pk %}">
+                        Edit
+                      </a>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted">
+        No programmes match your filters. Try clearing the filters
+        or create a new programme.
+      </p>
+    {% endif %}
+  </section>
+</main>
+</body>
+</html>

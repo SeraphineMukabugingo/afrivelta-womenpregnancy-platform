@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | AFRIVELTA WomenPregnancy{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+    <div>
+        <h1>Welcome, {{ request.user.first_name|default:request.user.username }}</h1>
+        <p>
+            Your workspace for programme coordination, youth education,
+            verified referrals and impact measurement.
+        </p>
+    </div>
+    <a class="btn btn-primary" href="/programmes/">
+        View programmes &rarr;
+    </a>
+</section>
+
+<section class="stats-grid" aria-label="Organisation statistics">
+    <article class="stat-card">
+        <div class="stat-label">Organisations accessible</div>
+        <div class="stat-value">{{ organization_count }}</div>
+        <div class="muted">Organisations visible to your account</div>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-label">Active organisations</div>
+        <div class="stat-value">{{ active_organization_count }}</div>
+        <div class="muted">Organisations with active status</div>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-label">Pending review</div>
+        <div class="stat-value">{{ pending_organization_count }}</div>
+        <div class="muted">Organisations awaiting review</div>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-label">Membership records</div>
+        <div class="stat-value">{{ membership_count }}</div>
+        <div class="muted">Membership records visible to your account</div>
+    </article>
+</section>
+
+<section aria-labelledby="modules-heading">
+    <div class="page-header">
+        <div>
+            <h2 id="modules-heading">Platform modules</h2>
+            <p>Choose a module to continue your work.</p>
+        </div>
+    </div>
+
+    <div class="card-grid">
+
+        <a class="card" href="/programmes/">
+            <div class="card-icon">01</div>
+            <span class="badge">Available</span>
+            <h2>Prevention Programme Planning</h2>
+            <p>
+                Create programmes, manage activities and milestones,
+                assign responsibilities and track implementation progress.
+            </p>
+            <p><strong>Open programme management &rarr;</strong></p>
+        </a>
+
+        <a class="card" href="/education/">
+            <div class="card-icon">02</div>
+            <span class="badge">Available for testing</span>
+            <h2>Youth Education</h2>
+            <p>
+                Manage educational articles, lessons, frequently asked
+                questions and resources with a review and approval process.
+            </p>
+            <p><strong>Open education library &rarr;</strong></p>
+        </a>
+
+        <a class="card" href="/modules/verified-referrals/">
+            <div class="card-icon">03</div>
+            <span class="badge">Under development</span>
+            <h2>Verified Health-Service Referrals</h2>
+            <p>
+                Develop a reviewed directory of health and support services,
+                with verification information and privacy-conscious
+                referral follow-up.
+            </p>
+            <p><strong>Explore the module &rarr;</strong></p>
+        </a>
+
+        <a class="card" href="/modules/impact-reporting/">
+            <div class="card-icon">04</div>
+            <span class="badge">Under development</span>
+            <h2>Impact Measurement &amp; Reporting</h2>
+            <p>
+                Prepare programme indicators, aggregate results,
+                milestone summaries and reports for organisational
+                learning and funders.
+            </p>
+            <p><strong>Explore the module &rarr;</strong></p>
+        </a>
+
+    </div>
+</section>
+
+<section style="margin-top: 30px;" aria-labelledby="organisations-heading">
+    <div class="page-header">
+        <div>
+            <h2 id="organisations-heading">Your organisations</h2>
+            <p>Organisations available in your current workspace.</p>
+        </div>
+    </div>
+
+    <div class="panel">
+        {% for organization in organizations %}
+            <div style="padding: 12px 0; border-bottom: 1px solid var(--border);">
+                <strong>{{ organization.name }}</strong>
+                <span class="badge">
+                    {{ organization.get_status_display }}
+                </span>
+            </div>
+        {% empty %}
+            <div class="empty-state">
+                <h3>No organisations available</h3>
+                <p>
+                    Your account does not currently have an active
+                    organisation available in this workspace.
+                </p>
+                <p>
+                    Contact the platform administrator if you believe
+                    you should have access to an organisation.
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Youth Education Library | AFRIVELTA{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <h1>Youth Education Library</h1>
+        <p>Discover reviewed educational materials and trusted learning resources.</p>
+    </div>
+    {% if user.is_staff %}
+        <a class="btn btn-primary" href="{% url 'content-create' %}">
+            + Add Resource
+        </a>
+    {% endif %}
+</section>
+
+<section class="panel" style="margin-bottom: 24px;">
+    <form method="get" action="{% url 'content-library-list' %}">
+        <label for="resource-search">Search learning materials</label>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <div style="flex:1; min-width:220px;">
+                <input id="resource-search"
+                       type="search"
+                       name="q"
+                       value="{{ search_query }}"
+                       placeholder="Search titles, topics or keywords">
+            </div>
+            <button class="btn btn-primary" type="submit">Search</button>
+            {% if search_query %}
+                <a class="btn btn-outline"
+                   href="{% url 'content-library-list' %}">Clear</a>
+            {% endif %}
+        </div>
+    </form>
+</section>
+
+{% if items %}
+    <div class="card-grid">
+        {% for item in items %}
+            <article class="card">
+                <div class="card-icon">
+                    {% if item.content_type == "lesson" %}L
+                    {% elif item.content_type == "faq" %}?
+                    {% elif item.content_type == "resource" %}R
+                    {% else %}A{% endif %}
+                </div>
+
+                <span class="badge">{{ item.get_content_type_display }}</span>
+                <h2 style="margin-top:14px;">
+                    <a href="{% url 'content-library-detail' item.pk %}">
+                        {{ item.title }}
+                    </a>
+                </h2>
+
+                <p>{{ item.summary|default:"No summary has been added yet." }}</p>
+
+                <p class="muted" style="margin-top:16px; font-size:13px;">
+                    {{ item.get_topic_display }} · {{ item.get_language_display }}
+                </p>
+
+                {% if user.is_staff %}
+                    <span class="badge">{{ item.get_review_status_display }}</span>
+                    {% if not item.is_published %}
+                        <span class="badge">Not published</span>
+                    {% endif %}
+                    <p style="margin-top:14px;">
+                        <a href="{% url 'content-update' item.pk %}">Edit resource →</a>
+                    </p>
+                {% endif %}
+            </article>
+        {% endfor %}
+    </div>
+{% else %}
+    <section class="panel empty-state">
+        <div class="card-icon" style="margin:0 auto 16px;">L</div>
+        <h2>No educational resources found</h2>
+        <p class="muted">
+            {% if search_query %}
+                Try another search term.
+            {% else %}
+                Reviewed and published resources will appear here.
+            {% endif %}
+        </p>
+        {% if user.is_staff %}
+            <a class="btn btn-primary" href="{% url 'content-create' %}">
+                Create the first resource
+            </a>
+        {% endif %}
+    </section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}{{ organization.name }} | AFRIVELTA{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">ORGANIZATION ADMINISTRATION</p>
+        <h1>{{ organization.name }}</h1>
+        <p>{{ organization.get_organization_type_display }} ·
+           {{ organization.country }}</p>
+    </div>
+    <a class="btn btn-outline"
+       href="{% url 'organization-admin-update' organization.pk %}">
+        Edit Details
+    </a>
+</section>
+
+<div class="card">
+    <h2>Organization Profile</h2>
+    <p><strong>Legal name:</strong> {{ organization.legal_name|default:"Not provided" }}</p>
+    <p><strong>Location:</strong> {{ organization.district_or_city|default:"Not provided" }}, {{ organization.country }}</p>
+    <p><strong>Email:</strong> {{ organization.contact_email|default:"Not provided" }}</p>
+    <p><strong>Website:</strong>
+        {% if organization.website %}
+            <a href="{{ organization.website }}" target="_blank" rel="noopener">
+                {{ organization.website }}
+            </a>
+        {% else %}Not provided{% endif %}
+    </p>
+    <p><strong>Status:</strong> {{ organization.get_status_display }}</p>
+    <p><strong>Last reviewed by:</strong>
+        {{ organization.reviewed_by|default:"Not reviewed" }}
+    </p>
+    <p><strong>Review notes:</strong>
+        {{ organization.review_notes|default:"No review notes" }}
+    </p>
+</div>
+
+<div class="card">
+    <h2>Organization Review</h2>
+    <p>Review actions are recorded with the administrator and review date.</p>
+
+    <form method="post"
+          action="{% url 'organization-admin-review' organization.pk %}">
+        {% csrf_token %}
+        <label for="review-notes">Review notes</label>
+        <textarea id="review-notes" name="review_notes"
+                  rows="3" placeholder="Record the review decision and reasons"></textarea>
+
+        <div class="form-actions">
+            {% if organization.status == "pending_review" %}
+                <button class="btn btn-primary" name="action" value="approve">
+                    Approve Organization
+                </button>
+                <button class="btn btn-outline" name="action" value="reject">
+                    Reject Application
+                </button>
+            {% elif organization.status == "active" %}
+                <button class="btn btn-outline" name="action" value="suspend">
+                    Suspend Organization
+                </button>
+            {% elif organization.status == "suspended" %}
+                <button class="btn btn-primary" name="action" value="reactivate">
+                    Reactivate Organization
+                </button>
+            {% elif organization.status == "rejected" %}
+                <button class="btn btn-outline" name="action" value="reopen">
+                    Return to Pending Review
+                </button>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="section-heading">
+        <h2>Memberships</h2>
+        <a class="btn btn-primary"
+           href="{% url 'organization-membership-create' organization.pk %}">
+            + Add Member
+        </a>
+    </div>
+
+    <p>
+        Active: {{ active_count }} ·
+        Invited: {{ invited_count }} ·
+        Suspended: {{ suspended_count }}
+    </p>
+
+    {% if memberships %}
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Organization Role</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in memberships %}
+                <tr>
+                    <td>{{ member.user.username }}</td>
+                    <td>{{ member.user.email }}</td>
+                    <td>{{ member.get_role_display }}</td>
+                    <td>{{ member.get_status_display }}</td>
+                    <td>
+                        <a href="{% url 'organization-membership-update' member.pk %}">
+                            Manage
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p>No organization members have been registered.</p>
+    {% endif %}
+</div>
+
+<a class="btn btn-outline" href="{% url 'organization-admin-list' %}">
+    Back to Organizations
+</a>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Verified Services | AFRIVELTA{% endblock %}
+{% block content %}
+<section class="page-header">
+  <div>
+    <h1>Verified Health-Service Directory</h1>
+    <p>Find reviewed health and support providers.</p>
+  </div>
+  {% if user.is_staff %}
+  <a class="btn btn-primary" href="{% url 'provider-create' %}">+ Add Provider</a>
+  {% endif %}
+</section>
+
+<form class="panel" method="get" style="margin-bottom:24px">
+  <label for="q">Search providers</label>
+  <input id="q" name="q" type="search" value="{{ search_query }}" placeholder="Provider or district">
+  <button class="btn btn-primary" type="submit">Search</button>
+</form>
+
+<div class="card-grid">
+{% for provider in providers %}
+  <article class="card">
+    <h2>{{ provider.name }}</h2>
+    <p>{{ provider.get_category_display }}</p>
+    <p>{{ provider.address }}, {{ provider.district }}</p>
+    <p><span class="badge">{{ provider.get_verification_status_display }}</span></p>
+    <p>Last verified: {{ provider.last_verified|default:"Not verified" }}</p>
+    {% if user.is_staff %}
+    <a href="{% url 'provider-update' provider.pk %}">Edit provider</a>
+    {% endif %}
+  </article>
+{% empty %}
+  <div class="panel empty-state">
+    <h2>No providers found</h2>
+    <p>No providers are available for display yet.</p>
+    {% if user.is_staff %}
+    <a class="btn btn-primary" href="{% url 'provider-create' %}">Add the first provider</a>
+    {% endif %}
+  </div>
+{% endfor %}
+</div>
+{% endblock %}

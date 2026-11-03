@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Referral Records | AFRIVELTA WomenPregnancy{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">VERIFIED REFERRALS</p>
+        <h1>Referral Records</h1>
+        <p>Manage and monitor referrals to verified service providers.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'referral-create' %}">
+        + Create Referral
+    </a>
+</section>
+
+<div class="card">
+    <h2>Find Referral Records</h2>
+
+    <form method="get" class="form-grid">
+        <div>
+            <label for="id_q">Search by reference or provider</label>
+            <input
+                type="search"
+                id="id_q"
+                name="q"
+                value="{{ search_query }}"
+                placeholder="Enter referral reference or provider name">
+        </div>
+
+        <div>
+            <label for="id_status">Referral Status</label>
+            <select id="id_status" name="status">
+                <option value="">All statuses</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}"
+                        {% if selected_status == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Search</button>
+            <a class="btn btn-outline" href="{% url 'referral-list' %}">
+                Clear
+            </a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="section-heading">
+        <h2>Referral Register</h2>
+        <span>{{ records|length }} record(s)</span>
+    </div>
+
+    {% if records %}
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Reference</th>
+                        <th>Service Provider</th>
+                        <th>Status</th>
+                        <th>Referral Date</th>
+                        <th>Follow-up Due</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        <td>
+                            <strong>{{ record.reference_code }}</strong>
+                        </td>
+                        <td>{{ record.provider.name }}</td>
+                        <td>{{ record.get_status_display }}</td>
+                        <td>{{ record.referral_date|date:"d M Y" }}</td>
+                        <td>
+                            {% if record.follow_up_due %}
+                                {{ record.follow_up_due|date:"d M Y" }}
+                            {% else %}
+                                Not scheduled
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'referral-detail' record.pk %}">
+                                View details
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>No referral records found</h3>
+            <p>There are no records matching your search.</p>
+            <a class="btn btn-primary"
+               href="{% url 'referral-create' %}">
+                Create First Referral
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Related Actions</h2>
+    <p>Manage the verified providers available for referrals.</p>
+    <a class="btn btn-outline"
+       href="{% url 'referral-follow-up-list' %}">
+        Manage Follow-ups
+    </a>
+
+    <a class="btn btn-outline" href="{% url 'provider-list' %}">
+        View Service Providers
+    </a>
+    <a class="btn btn-outline" href="{% url 'provider-create' %}">
+        Add Service Provider
+    </a>
+</div>
+{% endblock %}

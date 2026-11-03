@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Add Supporting Source | AFRIVELTA{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:20px">
+    <a href="{% url 'content-library-list' %}">
+        &larr; Back to Education Library
+    </a>
+</div>
+
+<section class="page-header">
+    <div>
+        <p class="muted">YOUTH EDUCATION LIBRARY</p>
+        <h1>Add a Supporting Source</h1>
+        <p>Record the evidence used to prepare this educational material.</p>
+    </div>
+</section>
+
+<section class="form-panel">
+    {% if item %}
+        <div class="panel" style="margin-bottom:24px">
+            <p class="muted">EDUCATIONAL MATERIAL</p>
+            <h2>{{ item.title }}</h2>
+            <p>Record a source that supports this content.</p>
+        </div>
+    {% endif %}
+
+    <div class="message" style="margin-bottom:24px">
+        Provide the original source organization, exact document or
+        page title, working URL, verification date, and relevant notes.
+        Only record a verification date after checking the source.
+    </div>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="message message-error">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            <div style="margin-bottom:22px">
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                    {% if field.field.required %}
+                        <span style="color:#b42318">*</span>
+                    {% endif %}
+                </label>
+
+                {{ field }}
+
+                {% if field.help_text %}
+                    <small class="helptext">{{ field.help_text }}</small>
+                {% endif %}
+
+                {% for error in field.errors %}
+                    <p style="color:#b42318">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <div style="display:flex;gap:12px;flex-wrap:wrap;
+                    padding-top:20px;border-top:1px solid var(--border)">
+            <button class="btn btn-primary" type="submit">
+                Save Source
+            </button>
+            {% if item %}
+                <a class="btn btn-outline"
+                   href="{% url 'content-library-detail' item.pk %}">
+                    Cancel
+                </a>
+            {% else %}
+                <a class="btn btn-outline"
+                   href="{% url 'content-library-list' %}">
+                    Cancel
+                </a>
+            {% endif %}
+        </div>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} | AFRIVELTA WomenPregnancy{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">REFERRAL MANAGEMENT</p>
+        <h1>{{ page_title }}</h1>
+        <p>
+            Connect individuals with appropriate, verified health
+            and support services.
+        </p>
+    </div>
+</section>
+
+<div class="form-panel">
+    <div class="message">
+        Confirm appropriate consent before recording a referral.
+        Use operational notes only. Do not enter names, contact details,
+        diagnoses or detailed health information.
+    </div>
+
+    {% if record %}
+        <div class="card" style="margin-bottom:20px">
+            <strong>Referral reference:</strong>
+            {{ record.reference_code }}
+            <br>
+            <strong>Current status:</strong>
+            {{ record.get_status_display }}
+        </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="message message-error">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            <div style="margin-bottom:20px">
+                {% if field.name == "status" and not record %}
+                    {{ field.as_hidden }}
+                {% else %}
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                        {% if field.field.required %}
+                            <span style="color:#b42318">*</span>
+                        {% endif %}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <small class="helptext">{{ field.help_text }}</small>
+                    {% endif %}
+                {% endif %}
+
+                {% for error in field.errors %}
+                    <p style="color:#b42318">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <div style="display:flex;gap:12px;flex-wrap:wrap;
+                    padding-top:18px;border-top:1px solid var(--border)">
+            <button type="submit" class="btn btn-primary">
+                {% if record %}Save Changes{% else %}Create Referral{% endif %}
+            </button>
+
+            <a class="btn btn-outline" href="{% url 'referral-list' %}">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

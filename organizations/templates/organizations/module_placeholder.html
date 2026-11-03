@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ module.title }} | WomenPregnancy</title>
+<style>
+:root {
+  --navy:#173548; --teal:#087f8c; --gold:#f2bc54;
+  --bg:#f2f6f8; --text:#263b49; --muted:#647b89; --border:#dbe5ea;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:Arial,sans-serif;
+}
+header {
+  background:var(--navy); color:white; padding:24px 5%;
+  display:flex; justify-content:space-between; align-items:center;
+  flex-wrap:wrap; gap:14px;
+}
+header h1 { margin:0; font-size:24px; }
+header h1 span { color:var(--gold); }
+header p { margin:7px 0 0; font-size:12px; letter-spacing:2px; }
+a { text-decoration:none; }
+.nav-link {
+  color:white; border:1px solid #7d919c;
+  border-radius:8px; padding:10px 14px;
+}
+main { max-width:1000px; padding:36px 20px; margin:auto; }
+.panel {
+  background:white; border:1px solid var(--border);
+  border-radius:14px; padding:28px; margin-bottom:20px;
+}
+.eyebrow {
+  color:var(--teal); font-size:13px;
+  font-weight:bold; letter-spacing:2px;
+}
+h2 { font-size:29px; line-height:1.35; }
+.muted { color:var(--muted); line-height:1.7; }
+.status {
+  display:inline-block; background:#fff2d7; color:#76520d;
+  padding:8px 12px; border-radius:20px; font-size:13px; font-weight:bold;
+}
+li { margin:12px 0; line-height:1.6; }
+.button {
+  display:inline-block; background:var(--teal); color:white;
+  padding:12px 16px; border-radius:8px; font-weight:bold;
+}
+@media(max-width:600px) {
+  .panel { padding:19px; }
+  h2 { font-size:24px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>AFRIVELTA <span>WomenPregnancy</span></h1>
+    <p>ORGANISATION IMPACT HUB</p>
+  </div>
+  <a class="nav-link" href="/">Back to dashboard</a>
+</header>
+<main>
+  <section class="panel">
+    <div class="eyebrow">WOMENPREGNANCY PLATFORM MODULE</div>
+    <h2>{{ module.title }}</h2>
+    <span class="status">{{ module.status }}</span>
+    <p class="muted">{{ module.description }}</p>
+  </section>
+
+  <section class="panel">
+    <h2>Planned capabilities</h2>
+    <ul>
+      {% for feature in module.features %}
+        <li>{{ feature }}</li>
+      {% endfor %}
+    </ul>
+    <p class="muted">
+      This is an overview page, not an operational feature. These
+      capabilities must be implemented and tested before being used
+      by participating organisations.
+    </p>
+    <a class="button" href="/">Return to organisation dashboard</a>
+  </section>
+</main>
+</body>
+</html>
